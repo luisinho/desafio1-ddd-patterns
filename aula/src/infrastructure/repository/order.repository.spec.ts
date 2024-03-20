@@ -238,6 +238,125 @@ describe('Order repository test', () => {
         });
     });
 
+
+    it('should update a order add item', async () => {
+
+        const customerRepository = new CustomerRepository();
+        const customer = new Customer('123', 'Customer 1');
+        const address = new Address('Street 1', 123, 'Zipcode 1', 'City 1');
+        customer.changeAddress(address);
+        await customerRepository.create(customer);
+
+        const productRepository = new ProductRepository();
+        const product1 = new Product('123', 'Product 1', 10);
+        const product2 = new Product('1234', 'Product 2', 30);
+        await productRepository.create(product1);
+        await productRepository.create(product2);
+
+        const orderItemInsert = new OrderItem(
+            '1',
+            product1.name,
+            product1.price,
+            product1.id,
+            2
+        );
+
+        const orderRepository = new OrderRepository();
+        const order = new Order('1', customer.id, [orderItemInsert]);
+        await orderRepository.create(order);
+
+        const orderModelInsert = await OrderModel.findOne({ 
+            where: { id: order.id },
+            include: ['items'],
+        });
+
+        expect(orderModelInsert.toJSON()).toStrictEqual({
+            id: order.id,
+            customer_id: customer.id,
+            total: order.total(),
+            items: [
+                {
+                 id: orderItemInsert.id,
+                 name: orderItemInsert.name,
+                 quantity: orderItemInsert.quantity,
+                 price: orderItemInsert.price,
+                 order_id: order.id,
+                 product_id: product1.id
+                }
+            ]
+        });
+        
+        const orderItemUpdate = new OrderItem(
+            '2',
+            product2.name,
+            product2.price,
+            product2.id,
+            4
+        );
+
+        order.addItems(orderItemUpdate);
+        await orderRepository.update(order);
+
+        const orderModelUpdate = await OrderModel.findOne({ 
+            where: { id: order.id },
+            include: ['items'],
+        });
+
+        expect(orderModelUpdate.toJSON()).toStrictEqual({
+            id: order.id,
+            customer_id: customer.id,
+            total: order.total(),
+            items: [
+                {
+                  id: orderItemInsert.id,
+                  name: orderItemInsert.name,
+                  quantity: orderItemInsert.quantity,
+                  price: orderItemInsert.price,
+                  order_id: order.id,
+                  product_id: product1.id
+                },
+                {
+                  id: orderItemUpdate.id,
+                  name: orderItemUpdate.name,
+                  quantity: orderItemUpdate.quantity,
+                  price: orderItemUpdate.price,
+                  order_id: order.id,
+                  product_id: product2.id
+                }
+            ]
+        });
+    });
+
+    it('should throw an error when update order is not found', async () => {
+
+        const customerRepository = new CustomerRepository();
+        const customer = new Customer('123', 'Customer 1');
+        const address = new Address('Street 1', 123, 'Zipcode 1', 'City 1');
+        customer.changeAddress(address);
+        await customerRepository.create(customer);
+
+        const productRepository = new ProductRepository();
+        const product = new Product('123', 'Product 1', 10);
+        await productRepository.create(product);
+
+        const orderItemInsert = new OrderItem(
+            '1',
+            product.name,
+            product.price,
+            product.id,
+            2
+        );
+
+        const orderRepository = new OrderRepository();
+        let order = new Order('1', customer.id, [orderItemInsert]);
+        await orderRepository.create(order);
+
+        expect(async () => {
+            order = new Order('2', customer.id, [orderItemInsert]);
+            await orderRepository.update(order);
+        }).rejects.toThrow('Failed to update order');
+    });
+
     it('should find a order', async () => {
 
         const customerRepository = new CustomerRepository();

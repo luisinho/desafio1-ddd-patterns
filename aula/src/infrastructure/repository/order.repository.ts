@@ -25,28 +25,33 @@ export default class OrderRepository implements OrderRepositoryInterface {
     }
 
     async update(entity: Order): Promise<void> {
-      const order = await OrderModel.findByPk(entity.id, {
-        include: ['items'],
-      });
-      await order
-        .update({
-          total: entity.total(),
-        }).then(() => {
-            
-            OrderItemModel.bulkCreate(
-                entity.items.map((item: OrderItem) => ({
-                  id: item.id,
-                  name: item.name,
-                  price: item.price,
-                  quantity: item.quantity,
-                  order_id: order.id,
-                  product_id: item.productId,
-                })),
-                {
-                  updateOnDuplicate: ['name', 'price', 'product_id', 'quantity']
-                }
-            );
-        });
+       try {
+            let sequelize = OrderModel.sequelize;
+            await sequelize.transaction(async (ts) => {
+              await OrderItemModel.destroy({
+                where: { order_id: entity.id },
+                transaction: ts,
+              });
+              const items = entity.items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                product_id: item.productId,
+                quantity: item.quantity,
+                order_id: entity.id,
+              }
+      
+              ));
+              await OrderItemModel.bulkCreate(items, { transaction: ts });
+              await OrderModel.update(
+                { total: entity.total() },
+                { where: { id: entity.id }, transaction: ts }
+              );
+       });
+       } catch (error) {
+          // console.log(error);
+          throw new Error('Failed to update order');
+       }
     }
 
     async find(id: string): Promise<Order> {

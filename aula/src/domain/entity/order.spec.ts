@@ -57,4 +57,19 @@ describe('Order unit test', () => {
 
         expect(order.items[0].price).toBe(200);
     });
+
+    it('should change add item order', () => {
+
+        let item = new OrderItem('1', 'Item 1', 100, 'p1', 2);
+        const order = new Order('1', '1', [item]);
+        item = new OrderItem('1', 'Item 1', 200, 'p1', 1);
+        order.changeItems([item]);
+
+        expect(order.items[0].price).toBe(200);
+
+        item = new OrderItem('2', 'Item 2', 100, 'p1', 1);
+        order.addItems(item);
+        expect(order.items.length).toBe(2);
+        expect(order.total()).toBe(300);
+    });
 });
