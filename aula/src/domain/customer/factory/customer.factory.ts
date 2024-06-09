@@ -10,7 +10,7 @@ export default class CustomerFactory {
         return new Customer(uuid(), name);
     }
 
-    public static createWithAddress(name: string, address: Address): CustomerInterface {
+    public static createWithAddress(name: string, address: Address): Customer {
         const customer = new Customer(uuid(), name);
         customer.changeAddress(address);
         return customer;
