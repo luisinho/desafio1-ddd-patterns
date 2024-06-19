@@ -1,9 +1,9 @@
 import { Sequelize } from 'sequelize-typescript';
 
+import UpdateProductUseCase from './update.product.usecase';
 import Product from '../../../domain/product/entity/product';
 import ProductModel from '../../../infrastructure/product/repository/sequilize/product.model';
 import ProductRepository from '../../../infrastructure/product/repository/sequilize/product.repository';
-import UpdateProductUseCase from './update.product.usecase';
 
 describe('Test update product integration use case', () => {
 
@@ -12,7 +12,7 @@ describe('Test update product integration use case', () => {
     beforeEach(async () => {
         sequelize = new Sequelize({
             dialect: "sqlite",
-            storage: ":memory",
+            storage: ":memory:",
             logging: false,
             sync: { force: true }
         });
@@ -30,14 +30,13 @@ describe('Test update product integration use case', () => {
 
         const productRepository = new ProductRepository();
         const usecase = new UpdateProductUseCase(productRepository);
-        const product = new Product('4', 'Product 4', 1.0);
+        const product = new Product('4', 'Product 4', 1.2);
         await productRepository.create(product);
-        await productRepository.find('4');
 
         const input = {
             id: '4',
             name: 'Product 1',
-            price: 1.0,
+            price: 1.1,
         };
 
         const result = await usecase.execute(input);

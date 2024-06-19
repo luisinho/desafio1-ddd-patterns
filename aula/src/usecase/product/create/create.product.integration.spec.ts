@@ -12,7 +12,7 @@ describe('Test create product integration use case', () => {
     beforeEach(async () => {
         sequelize = new Sequelize({
             dialect: "sqlite",
-            storage: ":memory",
+            storage: ":memory:",
             logging: false,
             sync: { force: true }
         });
@@ -46,7 +46,7 @@ describe('Test create product integration use case', () => {
         });
     });
 
-    /*it('should integration create a type ProductPrice', async () => {
+    it('should integration create a type ProductPrice', async () => {
 
         const productRepository = new ProductRepository();
         const usecase = new CreateProductUseCase(productRepository);
@@ -115,5 +115,5 @@ describe('Test create product integration use case', () => {
         await expect(usecase.execute(input)).rejects.toThrow(
             'Product type not supported'
         );
-    });*/
+    });
 });

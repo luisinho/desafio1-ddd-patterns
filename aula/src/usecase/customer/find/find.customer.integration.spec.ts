@@ -12,7 +12,7 @@ describe('Test find custome use case', () => {
     beforeEach(async () => {
         sequelize = new Sequelize({
             dialect: "sqlite",
-            storage: ":memory",
+            storage: ":memory:",
             logging: false,
             sync: { force: true }
         });

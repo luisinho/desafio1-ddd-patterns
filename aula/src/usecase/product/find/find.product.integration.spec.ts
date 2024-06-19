@@ -11,7 +11,7 @@ describe('Test find product integration use case', () => {
     beforeEach(async () => {
         sequelize = new Sequelize({
             dialect: "sqlite",
-            storage: ":memory",
+            storage: ":memory:",
             logging: false,
             sync: { force: true }
         });
