@@ -8,7 +8,7 @@ export default class FindProductUsecase {
         this.productRepository = productRepository;
     }
 
-    async execute(input: InputFindProductDto): Promise<OutputFindProductDto> {
+    async execute(input: InputFindProductDto): Promise<OutputFindProductDto> {        
         const product = await this.productRepository.find(input.id);
 
         return {

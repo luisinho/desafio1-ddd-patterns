@@ -49,7 +49,6 @@ export default class OrderRepository implements OrderRepositoryInterface {
               );
        });
        } catch (error) {
-          // console.log(error);
           throw new Error('Failed to update order');
        }
     }
