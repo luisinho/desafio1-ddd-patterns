@@ -14,6 +14,7 @@ export default class UpdateProductUseCase {
 
         product.changeName(input.name);
         product.changePrice(input.price);
+        product.checkErrorMessage();
 
         await this.productRepository.update(product);
 

@@ -58,7 +58,7 @@ describe('Test update product integration use case', () => {
         };
 
         await expect(usecase.execute(input)).rejects.toThrow(
-            'Name is required'
+            'product: Name is required'
         );
     });
 
@@ -76,7 +76,25 @@ describe('Test update product integration use case', () => {
         };
 
         await expect(usecase.execute(input)).rejects.toThrow(
-            'Price must be greater than zero'
+            'product: Price must be greater than zero'
+        );
+    });
+
+    it('should integration throw an error when name is missing and price less than zero', async () => {
+
+        const productRepository = new ProductRepository();
+        const usecase = new UpdateProductUseCase(productRepository);
+        const product = new Product('5', 'Product 5', 2.2);
+        await productRepository.create(product);
+
+        const input = {
+            id: '5',
+            name: '',
+            price: -1,
+        };
+
+        await expect(usecase.execute(input)).rejects.toThrow(
+            'product: Name is required,product: Price must be greater than zero'
         );
     });
 });
